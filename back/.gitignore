@@ -1,0 +1,117 @@
+
+
+# BACKEND
+
+# =========================
+# Python
+# =========================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# =========================
+# Environment / secrets
+# =========================
+.env
+.env.*
+!.env.example
+
+# =========================
+# IDE
+# =========================
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# =========================
+# OS
+# =========================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# =========================
+# Pytest / coverage
+# =========================
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+
+# =========================
+# Mypy / Ruff
+# =========================
+.mypy_cache/
+.ruff_cache/
+.pyre/
+.pytype/
+
+# =========================
+# FastAPI / logs
+# =========================
+*.log
+logs/
+
+# =========================
+# Alembic
+# =========================
+# НЕ игнорировать миграции!
+# alembic/versions/ должен попадать в Git
+
+# =========================
+# Database
+# =========================
+*.db
+*.sqlite
+*.sqlite3
+
+# =========================
+# Stripe
+# =========================
+# Stripe CLI local files / logs
+.stripe/
+stripe.log
+
+# =========================
+# Build / packaging
+# =========================
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# =========================
+# Local files
+# =========================
+*.tmp
+*.temp
+*.bak
+
+# =========================
+# Uploads / generated files
+# =========================
+uploads/
+media/
+staticfiles/
+
+# =========================
+# Jupyter
+# =========================
+.ipynb_checkpoints/
+
+# =========================
+# Secrets / certificates
+# =========================
+*.pem
+*.key
+*.crt
