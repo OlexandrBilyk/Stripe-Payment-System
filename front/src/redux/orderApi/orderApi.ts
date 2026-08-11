@@ -8,7 +8,7 @@ type ResType = {
 
 export const orderApi = createApi({
     reducerPath: 'order',
-    baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:8000', credentials: 'include' }),
+    baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:8000/checkout', credentials: 'include' }),
     endpoints: (builder) => ({
         postOrder: builder.mutation<ResType, number>({
             query: (productId) => ({

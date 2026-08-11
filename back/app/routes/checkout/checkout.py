@@ -1,34 +1,17 @@
-from fastapi import FastAPI, Depends, Request, HTTPException, Body
-from fastapi.middleware.cors import CORSMiddleware
-from dotenv import load_dotenv
-from db import get_db, Customer, Order, Payment, Product
+from fastapi import APIRouter, Depends, Request, HTTPException, Body
+from app.models import Customer, Order, Payment, Product
+from app.db import get_db
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
-import os
 import stripe
-
-load_dotenv()
-
-STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY')
-STRIPE_WEBHOOK_SECRET = os.getenv('STRIPE_WEBHOOK_SECRET')
-
-stripe.api_key = os.getenv('STRIPE_SECRET_KEY')
-
-app = FastAPI()
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-    ],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],)
+from app.core import STRIPE_WEBHOOK_SECRET
 
 
-@app.post('/order')
+router = APIRouter()
+
+
+@router.post('/order')
 async def order(product_id: int = Body(...), db: AsyncSession = Depends(get_db)):
     product = (await db.execute(select(Product).where(Product.id == product_id))).scalars().first()
 
@@ -62,7 +45,7 @@ async def order(product_id: int = Body(...), db: AsyncSession = Depends(get_db))
         return res
 
 
-@app.post('/webhook')
+@router.post('/webhook')
 async def webhook(req: Request, db: AsyncSession = Depends(get_db)):
     payload = await req.body()
 
