@@ -4,13 +4,14 @@ from fastapi import Response
 
 def set_cookies(res: Response, access_token: str, refresh_token: str):
     secure = not DEBUG
+    samesite = 'none' if secure else 'lax'
 
     res.set_cookie(
         key="access_token",
         value=access_token,
         httponly=True,
         max_age=60 * 12,
-        samesite="none",
+        samesite=samesite,
         secure=secure,  
         path="/",
     )
@@ -20,7 +21,7 @@ def set_cookies(res: Response, access_token: str, refresh_token: str):
         value=refresh_token,
         httponly=True,
         max_age=60 * 60 * 24,
-        samesite="none",
+        samesite=samesite,
         secure=secure,  
         path="/",
     )
