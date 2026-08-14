@@ -5,7 +5,7 @@ from app.db import Base
 
 if TYPE_CHECKING:
     from ..customer import Customer
-    from .product import Product
+    from .cart_items import CartItem
 
 
 class Cart(Base):
@@ -13,8 +13,8 @@ class Cart(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
 
+    customer_id: Mapped[int] = mapped_column(ForeignKey('customers.id'))
     customer: Mapped['Customer'] = relationship(back_populates='cart')
-    customer_id: Mapped[int] = relationship(ForeignKey('customers.id'))
 
-    products: Mapped[List['Product']] = relationship(back_populates='carts')
+    cart_items: Mapped[List['CartItem']] = relationship(back_populates='cart')
 

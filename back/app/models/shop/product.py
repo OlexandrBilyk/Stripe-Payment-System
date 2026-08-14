@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, List
 from app.db import Base
 
 if TYPE_CHECKING:
-    from .cart import Cart
+    from .cart_items import CartItem
 
 
 class Product(Base):
@@ -13,4 +13,4 @@ class Product(Base):
     name: Mapped[str] = mapped_column()
     price: Mapped[int] = mapped_column(default=0)
 
-    carts: Mapped[List['Cart']] = relationship(back_populates='products')
+    cart_items: Mapped[List['CartItem']] = relationship(back_populates='product')

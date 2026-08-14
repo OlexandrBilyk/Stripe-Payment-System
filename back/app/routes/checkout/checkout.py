@@ -34,6 +34,7 @@ async def order(product_id: int = Body(...), db: AsyncSession = Depends(get_db))
 
         db.add(new_order)
         db.add(new_payment)
+        
         await db.flush()
 
         res = {
