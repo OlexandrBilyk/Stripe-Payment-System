@@ -6,11 +6,13 @@ router = APIRouter()
 
 router.include_router(
     checkout_router, 
-    prefix='/checkout'
+    prefix='/checkout',
+    tags=['Checkout']
 )
 
 router.include_router(
     auth_router, 
-    prefix='/auth'
+    prefix='/auth',
+    tags=['Auth']
 )
 
