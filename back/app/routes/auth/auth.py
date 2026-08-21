@@ -104,7 +104,12 @@ async def register(
         password=hashed_password
     )
 
+    cart = Cart(
+        customer=new_customer
+    )
+
     db.add(new_customer)
+    db.add(cart)
 
     await db.flush()
 
@@ -113,14 +118,14 @@ async def register(
         'name': new_customer.name,
         'email': new_customer.email
     }
-
-    res = JSONResponse(
-        status_code=status.HTTP_200_OK,
-        content='Login successful'
-    )
     
     access_token = encode_token(payload, 'access', 10)
     refresh_token = encode_token(payload, 'refresh', 60 * 24)
+
+    res = JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content='Register successful'
+    )
 
     set_cookies(res, access_token, refresh_token)
 
@@ -147,14 +152,14 @@ async def login(
                 'name': customer.name,
                 'email': customer.email
             }
+            
+            access_token = encode_token(payload, 'access', 10)
+            refresh_token = encode_token(payload, 'refresh', 60 * 24)
 
             res = JSONResponse(
                 status_code=status.HTTP_200_OK,
                 content='Login successful'
             )
-            
-            access_token = encode_token(payload, 'access', 10)
-            refresh_token = encode_token(payload, 'refresh', 60 * 24)
 
             set_cookies(res, access_token, refresh_token)
 
@@ -169,3 +174,38 @@ async def login(
             status_code=status.HTTP_404_NOT_FOUND,
             detail='User not found'
         )
+
+
+@router.get('/logout')
+async def logout():
+    res = JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content='Logout successful'
+    )
+
+    res.delete_cookie('access_token')
+    res.delete_cookie('refresh_token')
+
+    return res
+
+
+@router.get('/refresh')
+async def refresh(
+    req: Request
+):
+    refresh = req.cookies.get('refresh_token')
+
+    payload = verify_token(refresh)
+
+    access_token = encode_token(payload, 'access', 10)
+    refresh_token = encode_token(payload, 'refresh', 60 * 24)
+
+    res = JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content='Tokens refreshed successfully'
+    )
+
+    set_cookies(res, access_token, refresh_token)
+
+    return res
+  

@@ -1,4 +1,5 @@
 from pydantic import BaseModel, EmailStr
+from .cart_schemas import CartResponse
 from typing import List
 
 
@@ -18,5 +19,7 @@ class CustomerLogin(BaseModel):
 
 class CustromerResponse(CustomerBase):
     id: int
+
+    cart: CartResponse
 
     # orders: List[]
