@@ -1,7 +1,7 @@
 from fastapi import HTTPException, Request, status, Depends
 from app.core import JWT_SECRET_KEY, JWT_ALGORITHM
 from app.db import get_db
-from app.models import Customer, Cart, CartItem
+from app.models import Customer, Cart, CartItem, Order
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from sqlalchemy import select
@@ -53,9 +53,9 @@ async def verify_user(req: Request, db: AsyncSession = Depends(get_db)):
                     selectinload(Customer.cart)
                     .selectinload(Cart.cart_items)
                     .selectinload(CartItem.product),
-                    
-                    selectinload(Customer.orders),
-
+                    selectinload(Customer.oauth_accounts),
+                    selectinload(Customer.orders)
+                    .selectinload(Order.order_items),
                 )
             )
         ).scalar_one_or_none()

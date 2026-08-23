@@ -1,5 +1,8 @@
 from pydantic import BaseModel, field_validator
+from .orders_chemas import BaseResponse
 from typing import List
+from .base_schemas import ProductResponse, BaseResponse
+
 
 class CartItemCreate(BaseModel):
     product_id: int
@@ -14,28 +17,12 @@ class CartItemCreate(BaseModel):
         return value
 
 
-class ProductResponse(BaseModel):
-    id: int
-    name: str
-    price: int
-
-    class Config:
-        from_attributes = True
-
-
-
-class CartItemResponse(BaseModel):
+class CartItemResponse(BaseResponse):
     id: int
     quantity: int
     product: ProductResponse
 
-    class Config:
-        from_attributes = True
 
-
-class CartResponse(BaseModel):
+class CartResponse(BaseResponse):
     id: int
     cart_items: List[CartItemResponse]
-
-    class Config:
-        from_attributes = True

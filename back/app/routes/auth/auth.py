@@ -28,14 +28,19 @@ oauth.register(
 
 
 @router.get('/google/login')
-async def google_login(req: Request):
+async def google_login(
+    req: Request
+):
     redirect_url = req.url_for('google_callback')
 
     return await oauth.google.authorize_redirect(req, redirect_url)
 
 
 @router.get('/google/callback')
-async def google_callback(req: Request, db: AsyncSession = Depends(get_db)):
+async def google_callback(
+    req: Request, 
+    db: AsyncSession = Depends(get_db)
+):
     token = await oauth.google.authorize_access_token(req)
 
     user_info: dict = token.get('userinfo')

@@ -7,6 +7,7 @@ from typing import List, TYPE_CHECKING
 if TYPE_CHECKING:
     from .payment import Payment
     from ..customer import Customer
+    from ..shop import Product
 
 
 class OrderStatus(str, Enum):
@@ -21,7 +22,6 @@ class Order(Base):
     __tablename__ = 'orders'
     
     id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column()
     status: Mapped[OrderStatus] = mapped_column(
         SQLEnum(OrderStatus),
         default=OrderStatus.PENDING,
@@ -32,3 +32,20 @@ class Order(Base):
 
     payments: Mapped[List['Payment']] = relationship(back_populates='order')
 
+    order_items: Mapped[List['OrderItem']] = relationship(back_populates='order')
+
+
+class OrderItem(Base):
+    __tablename__ = 'order_items'
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+
+    order: Mapped['Order'] = relationship(back_populates='order_items')
+    order_id: Mapped[int] = mapped_column(ForeignKey('orders.id'))
+
+    product: Mapped['Product'] = relationship(back_populates='order_items')
+    product_id: Mapped[int] = mapped_column(ForeignKey('products.id'))
+
+    quantity: Mapped[int] = mapped_column()
+
+    price: Mapped[int] = mapped_column()

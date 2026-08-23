@@ -1,6 +1,9 @@
+from __future__ import annotations
+
 from pydantic import BaseModel, EmailStr
 from .cart_schemas import CartResponse
 from typing import List
+from .orders_chemas import OrderItemResponse
 
 
 class CustomerBase(BaseModel):
@@ -22,4 +25,9 @@ class CustromerResponse(CustomerBase):
 
     cart: CartResponse
 
-    # orders: List[]
+    orders: List[OrderItemResponse]
+
+
+class ChangePassword(BaseModel):
+    old_password: str
+    new_password: str

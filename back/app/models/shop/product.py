@@ -4,7 +4,7 @@ from app.db import Base
 
 if TYPE_CHECKING:
     from .cart_items import CartItem
-
+    from ..orders import OrderItem
 
 class Product(Base):
     __tablename__ = 'products'
@@ -14,3 +14,5 @@ class Product(Base):
     price: Mapped[int] = mapped_column(default=0)
 
     cart_items: Mapped[List['CartItem']] = relationship(back_populates='product')
+
+    order_items: Mapped[List['OrderItem']] = relationship(back_populates='product')
