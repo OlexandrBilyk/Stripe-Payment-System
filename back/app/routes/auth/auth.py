@@ -129,7 +129,9 @@ async def register(
 
     res = JSONResponse(
         status_code=status.HTTP_200_OK,
-        content='Register successful'
+        content={
+            'message': 'Register successful'
+        },
     )
 
     set_cookies(res, access_token, refresh_token)
@@ -163,7 +165,9 @@ async def login(
 
             res = JSONResponse(
                 status_code=status.HTTP_200_OK,
-                content='Login successful'
+                content={
+                    'message': 'Login successful'
+                },
             )
 
             set_cookies(res, access_token, refresh_token)
@@ -185,7 +189,9 @@ async def login(
 async def logout():
     res = JSONResponse(
         status_code=status.HTTP_200_OK,
-        content='Logout successful'
+        content={
+            'message': 'Logout successful'
+        },   
     )
 
     res.delete_cookie('access_token')
@@ -207,7 +213,9 @@ async def refresh(
 
     res = JSONResponse(
         status_code=status.HTTP_200_OK,
-        content='Tokens refreshed successfully'
+        content={
+            'message': 'Tokens refreshed successfully'
+        },   
     )
 
     set_cookies(res, access_token, refresh_token)
