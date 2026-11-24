@@ -9,13 +9,13 @@ if TYPE_CHECKING:
 
 
 class PaymentStatus(str, Enum):
-    PENDING = "pending"
     REQUIRES_PAYMENT_METHOD = "requires_payment_method"
+    REQUIRES_CONFIRMATION = "requires_confirmation"
+    REQUIRES_ACTION = "requires_action"
     PROCESSING = "processing"
-    SUCCEEDED = "succeeded"
-    FAILED = "failed"
+    REQUIRES_CAPTURE = "requires_capture"
     CANCELED = "canceled"
-    REFUNDED = "refunded"
+    SUCCEEDED = "succeeded"
 
 
 class Payment(Base):
@@ -25,7 +25,7 @@ class Payment(Base):
     stripe_id: Mapped[str] = mapped_column(unique=True)
     status: Mapped[PaymentStatus] = mapped_column(
         SQLEnum(PaymentStatus),
-        default=PaymentStatus.PENDING,
+        default=PaymentStatus.REQUIRES_PAYMENT_METHOD,
     )
 
     order: Mapped['Order'] = relationship(back_populates='payments')

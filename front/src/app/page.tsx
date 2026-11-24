@@ -1,9 +1,9 @@
-import Order from "@/components/Order/Order"
+import Home from "@/components/Home/Home"
 
 export default function HomePage() {
   return (
     <>
-      <Order></Order>
+      <Home></Home>
     </>
   )
 }

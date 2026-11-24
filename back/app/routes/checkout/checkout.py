@@ -5,11 +5,13 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 import stripe
-from app.core import STRIPE_WEBHOOK_SECRET
+from stripe import StripeClient
+from app.core import STRIPE_WEBHOOK_SECRET, STRIPE_API_SECRET
 from app.services.auth import verify_user
 
-
 router = APIRouter()
+
+stripe_client = StripeClient(STRIPE_API_SECRET)
 
 
 @router.post('/order')
@@ -40,12 +42,12 @@ async def order(
 
             all_price += (item.product.price * item.quantity)
 
-        
-        payment_intent = stripe.PaymentIntent.create(
-            amount=all_price,
-            currency='usd',
-        )
 
+
+        payment_intent = stripe_client.v1.payment_intents.create({
+                'amount': all_price,
+                'currency':'usd'
+        })
 
         new_payment = Payment(
             order=new_order,            
@@ -79,10 +81,10 @@ async def webhook(
 ):
     payload = await req.body()
 
-    signature = req.headers.get('Stripe-Signature')
+    signature = req.headers.get('STRIPE_SIGNATURE')
 
     try:
-        event = stripe.Webhook.construct_event(
+        event = stripe_client.construct_event(
             payload=payload,
             sig_header=signature,
             secret=STRIPE_WEBHOOK_SECRET
@@ -93,21 +95,29 @@ async def webhook(
             status_code=400,
             detail="Invalid payload"
         )
-    except stripe.SignatureVerificationError:
+    except stripe.error.SignatureVerificationError:
         raise HTTPException(
             status_code=400,
             detail="Invalid signature"
         )
 
 
-    event_type = event['type']
+    event_dict = event.to_dict()
 
-    if event_type == 'payment_intent.succeeded':
-        payment_intent = event['data']['object']
+    if event_dict['type'] == 'payment_intent.succeeded':
+        payment_intent = event_dict['data']['object']
 
         stripe_id = payment_intent['id']
 
-        payment = (await db.execute(select(Payment).options(selectinload(Payment.order)).where(Payment.stripe_id == stripe_id))).scalar_one_or_none()
+        payment = (
+            await db.execute(
+                select(Payment)
+                .options(
+                    selectinload(Payment.order)
+                )
+                .where(Payment.stripe_id == stripe_id)
+            )
+        ).scalar_one_or_none()
 
         if payment:
             payment.status = PaymentStatus.SUCCEEDED
@@ -119,7 +129,18 @@ async def webhook(
             for item in cart.cart_items:
                 await db.delete(item)
 
+                
+    elif event_dict['type'] == 'payment_intent.payment_failed':
+        payment_intent = event_dict['data']['object']
 
+        stripe_id = payment_intent['id']
+
+        payment = (await db.execute(select(Payment).options(selectinload(Payment.order)).where(Payment.stripe_id == stripe_id))).scalar_one_or_none()
+
+        if payment:
+            payment.status = payment_intent['status']
+
+            payment.order.status = OrderStatus.PENDING
 
 
     return {"received": True}

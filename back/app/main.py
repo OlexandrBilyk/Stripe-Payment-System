@@ -5,7 +5,7 @@ from app.core import STRIPE_API_SECRET, SESSION_SECRET_KEY
 from .routes.router import router
 import stripe
 
-stripe.api_key = STRIPE_API_SECRET
+# stripe.api_key = STRIPE_API_SECRET
 
 app = FastAPI()
 

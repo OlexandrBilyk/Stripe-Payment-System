@@ -1,4 +1,5 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { baseQueryWithReauth } from "../baseQuery";
 
 type ResType = {
     id: string,
@@ -8,11 +9,11 @@ type ResType = {
 
 export const orderApi = createApi({
     reducerPath: 'order',
-    baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:8000/checkout', credentials: 'include' }),
+    baseQuery: baseQueryWithReauth,
     endpoints: (builder) => ({
         postOrder: builder.mutation<ResType, number>({
             query: (productId) => ({
-                url: '/order',
+                url: '/checkout/order',
                 body: productId,
                 method: 'POST'
             })
