@@ -20,38 +20,6 @@ async def get_profile(
     return customer 
 
 
-@router.post('/cart', response_model=CartResponse)
-async def add_cart_item(
-    data: CartItemCreate,
-    db: AsyncSession = Depends(get_db),
-    customer: Customer = Depends(verify_user),
-):
-    product = (
-        await db.execute(
-            select(Product)
-            .where(Product.id == data.product_id)
-        )
-    ).scalar_one_or_none()
-
-    if product:
-        new_cart_item = CartItem(
-            cart=customer.cart,
-            product=product,
-            quantity=data.quantity
-        )
-
-        db.add(new_cart_item)
-
-        await db.flush()
-
-        return customer.cart
-    else:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail='Product not found'
-        )
-
-
 @router.post('/add-password')
 async def add_password(
     new_password: str = Body(..., embed=True),
@@ -80,7 +48,6 @@ async def add_password(
 
     return res
     
-
 
 @router.post('/change-password')
 async def change_password(
@@ -115,4 +82,83 @@ async def change_password(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail='Old password is incorrect'
+        )
+
+
+@router.get('/cart', response_model=CartResponse)
+async def get_cart_item(
+    db: AsyncSession = Depends(get_db),
+    customer: Customer = Depends(verify_user),
+):
+    return customer.cart
+
+
+@router.post('/cart', response_model=CartResponse)
+async def add_cart_item(
+    data: CartItemCreate,
+    db: AsyncSession = Depends(get_db),
+    customer: Customer = Depends(verify_user),
+):
+    product = (
+        await db.execute(
+            select(Product)
+            .where(Product.id == data.product_id)
+        )
+    ).scalar_one_or_none()
+
+    if product:
+        cart_item = (await db.execute(select(CartItem).where(CartItem.cart == customer.cart, CartItem.product == product))).scalar_one_or_none()
+
+        if cart_item:
+            cart_item.quantity += data.quantity
+        else:
+            new_cart_item = CartItem(
+                cart=customer.cart,
+                product=product,
+                quantity=data.quantity
+            )
+
+            db.add(new_cart_item)
+
+        await db.flush()
+
+        return customer.cart
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='Product not found'
+        )
+
+
+@router.patch('/cart', response_model=CartResponse)
+async def change_cart_item_quantity(
+    data: CartItemCreate,
+    db: AsyncSession = Depends(get_db),
+    customer: Customer = Depends(verify_user),
+):
+    product = (
+        await db.execute(
+            select(Product)
+            .where(Product.id == data.product_id)
+        )
+    ).scalar_one_or_none()
+
+    if product:
+        cart_item = (await db.execute(select(CartItem).where(CartItem.cart == customer.cart, CartItem.product == product))).scalar_one_or_none()
+
+        if cart_item:
+            cart_item.quantity = data.quantity
+
+            await db.flush()
+
+            return customer.cart
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail='Cart item not found'
+            )
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='Product not found'
         )

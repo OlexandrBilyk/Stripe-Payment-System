@@ -16,5 +16,5 @@ class Cart(Base):
     customer_id: Mapped[int] = mapped_column(ForeignKey('customers.id'))
     customer: Mapped['Customer'] = relationship(back_populates='cart')
 
-    cart_items: Mapped[List['CartItem']] = relationship(back_populates='cart')
+    cart_items: Mapped[List['CartItem']] = relationship(back_populates='cart', order_by="CartItem.id")
 

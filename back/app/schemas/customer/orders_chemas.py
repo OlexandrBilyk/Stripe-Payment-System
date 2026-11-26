@@ -21,6 +21,5 @@ class PaymentResponse(BaseResponse):
 class OrderResponse(BaseResponse):
     id: int
     status: OrderStatus
-    customer_id: int
     payments: List[PaymentResponse]
     order_items: List[OrderItemResponse]

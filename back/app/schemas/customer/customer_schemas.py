@@ -3,7 +3,7 @@ from __future__ import annotations
 from pydantic import BaseModel, EmailStr
 from .cart_schemas import CartResponse
 from typing import List
-from .orders_chemas import OrderItemResponse
+from .orders_chemas import OrderResponse
 
 
 class CustomerBase(BaseModel):
@@ -25,7 +25,7 @@ class CustromerResponse(CustomerBase):
 
     cart: CartResponse
 
-    orders: List[OrderItemResponse]
+    orders: List[OrderResponse]
 
 
 class ChangePassword(BaseModel):
